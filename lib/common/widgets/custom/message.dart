@@ -29,7 +29,7 @@ void showToastMessage(
   Widget toast = FadeInUp(
     from: 20,
     child: Container(
-      width: screenWidth * 0.9,
+      width: screenWidth * 0.7,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(

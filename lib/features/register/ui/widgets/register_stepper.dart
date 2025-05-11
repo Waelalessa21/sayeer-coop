@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sayeercoop/common/layout/responsive.dart';
 import 'package:sayeercoop/common/routing/extension.dart';
 import 'package:sayeercoop/common/routing/routes.dart';
@@ -123,7 +124,7 @@ class _RegisterStepperState extends State<RegisterStepper> {
         'assets/icons/check.png',
         isError: false,
       );
-      context.pushNamed(Routes.doneScreen);
+      context.go(Routes.doneScreen);
     } catch (e) {
       showToastMessage(
         context,

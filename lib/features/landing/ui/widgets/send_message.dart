@@ -12,37 +12,67 @@ class SendMessage extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            "تواصل معنا",
-            style: TextStyle(
-              color: TColors.SbuttomColor,
-              fontWeight: FontWeight.bold,
-              fontFamily: "IBMPlexSansArabic",
-              fontSize: 30,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'وصل لنا الرسالة اللي تبيها أو اسأل السؤال اللي تبي تعرفه!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: isDesktop ? 18 : 16,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width:
-                isDesktop
-                    ? MediaQuery.of(context).size.width * 0.6
-                    : MediaQuery.of(context).size.width * 0.8,
-            child: SendMessageForm(),
-          ),
-        ],
-      ),
+      child:
+          isDesktop
+              ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 100.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "تواصل معنا",
+                          style: TextStyle(
+                            color: TColors.SbuttomColor,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "IBMPlexSansArabic",
+                            fontSize: 40,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'وصل لنا الرسالة اللي تبيها أو اسأل السؤال اللي تبي تعرفه!',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 75),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    child: const SendMessageForm(),
+                  ),
+                ],
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "تواصل معنا",
+                    style: TextStyle(
+                      color: TColors.SbuttomColor,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "IBMPlexSansArabic",
+                      fontSize: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'وصل لنا الرسالة اللي تبيها أو اسأل السؤال اللي تبي تعرفه!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: const SendMessageForm(),
+                  ),
+                ],
+              ),
     );
   }
 }

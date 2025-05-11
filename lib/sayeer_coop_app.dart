@@ -16,7 +16,21 @@ class SayeerCoopApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp.router(
           title: 'Sayeer | ساير',
-          theme: ThemeData(fontFamily: "IBMPlexSansArabic"),
+          theme: ThemeData(
+            fontFamily: "IBMPlexSansArabic",
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: const Color(0xFFF2F9FE),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFFF2F9FE),
+              elevation: 0,
+              iconTheme: IconThemeData(color: Colors.black),
+              titleTextStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
           debugShowCheckedModeBanner: false,
           locale: const Locale('ar'),
           supportedLocales: const [Locale('ar')],
@@ -27,9 +41,19 @@ class SayeerCoopApp extends StatelessWidget {
           ],
           routerConfig: AppRouter.router,
           builder: (context, child) {
-            return Directionality(
+            final Widget dirChild = Directionality(
               textDirection: TextDirection.rtl,
-              child: child!,
+              child: child ?? const SizedBox(),
+            );
+            // Ensure overlay is available for FlutterToast
+            return MediaQuery(
+              data: MediaQuery.of(context),
+              child: Navigator(
+                key: GlobalKey<NavigatorState>(),
+                onGenerateRoute:
+                    (settings) =>
+                        MaterialPageRoute(builder: (context) => dirChild),
+              ),
             );
           },
         );
