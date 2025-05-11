@@ -3,7 +3,9 @@ import 'package:sayeercoop/common/layout/responsive.dart';
 import 'package:sayeercoop/features/register/ui/widgets/register_stepper.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final String? referralCode;
+
+  const RegisterScreen({super.key, this.referralCode});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

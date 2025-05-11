@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sayeercoop/common/routing/extension.dart';
 import 'package:sayeercoop/common/routing/routes.dart';
 import 'package:sayeercoop/common/theme/colors.dart';
@@ -100,7 +101,7 @@ class _MobileHeaderState extends State<MobileHeader>
                               label: 'قدّم الآن',
                               onTap: () {
                                 _toggleMenu(false);
-                                context.pushNamed(Routes.registerScreen);
+                                context.go(Routes.registerScreen);
                               },
                             ),
                             SizedBox(width: 20.w),

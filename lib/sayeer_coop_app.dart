@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sayeercoop/common/routing/app_router.dart';
-import 'package:sayeercoop/common/routing/routes.dart';
 
 class SayeerCoopApp extends StatelessWidget {
   final AppRouter appRouter;
@@ -15,7 +14,7 @@ class SayeerCoopApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: 'Sayeer | ساير',
           theme: ThemeData(fontFamily: "IBMPlexSansArabic"),
           debugShowCheckedModeBanner: false,
@@ -26,8 +25,7 @@ class SayeerCoopApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          onGenerateRoute: appRouter.generateRoute,
-          initialRoute: Routes.landingScreen,
+          routerConfig: AppRouter.router,
           builder: (context, child) {
             return Directionality(
               textDirection: TextDirection.rtl,

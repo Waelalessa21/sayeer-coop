@@ -1,27 +1,24 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-extension Navigation on BuildContext {
-  Future<dynamic> pushNamed(String routeName, {Object? arguments}) {
-    return Navigator.of(this).pushNamed(routeName, arguments: arguments);
+extension BuildContextExtension on BuildContext {
+  void pushNamed(String routeName, {Object? arguments}) {
+    goNamed(routeName, extra: arguments);
   }
 
-  Future<dynamic> pushReplacementNamed(String routeName, {Object? arguments}) {
-    return Navigator.of(
-      this,
-    ).pushReplacementNamed(routeName, arguments: arguments);
+  void pushReplacementNamed(String routeName, {Object? arguments}) {
+    goNamed(routeName, extra: arguments);
   }
 
-  Future<dynamic> pushNamedAndRemoveUntil(
-    String routeName, {
+  void pushNamedAndRemoveUntil(
+    String routeName,
+    bool Function(Route<dynamic>) predicate, {
     Object? arguments,
-    required RoutePredicate predicate,
   }) {
-    return Navigator.of(
-      this,
-    ).pushNamedAndRemoveUntil(routeName, predicate, arguments: arguments);
+    go(routeName);
   }
 
-  void pop() => Navigator.of(this).pop();
+  void pop() => go('/');
 }
 
 extension StringExtension on String? {

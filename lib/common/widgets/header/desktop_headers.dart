@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sayeercoop/common/routing/extension.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sayeercoop/common/routing/routes.dart';
 import 'package:sayeercoop/common/theme/colors.dart';
 import 'package:sayeercoop/common/widgets/buttons/header_button.dart';
@@ -21,12 +21,15 @@ class DesktopHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            'ساير',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 26,
-              color: TColors.Ssecondery,
+          InkWell(
+            onTap: () => context.go(Routes.landingScreen),
+            child: Text(
+              'ساير',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 26,
+                color: TColors.Ssecondery,
+              ),
             ),
           ),
           Row(
@@ -35,7 +38,7 @@ class DesktopHeader extends StatelessWidget {
               const SizedBox(width: 24),
               HeaderLink(
                 label: 'قدّم الآن',
-                onTap: () => context.pushNamed(Routes.registerScreen),
+                onTap: () => context.go(Routes.registerScreen),
               ),
               const SizedBox(width: 24),
               HeaderLink(label: 'اكتب رسالتك', onTap: onSendMessageTap),

@@ -11,20 +11,24 @@ class ArrowButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 16,
-        height: 16,
         decoration: BoxDecoration(
-          color: TColors.textWhite,
-          borderRadius: BorderRadius.circular(5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: Offset(0, 2),
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: const Icon(Icons.arrow_back_ios, size: 8, color: Colors.black87),
+
+        child: Text(
+          'السابق',
+          style: TextStyle(
+            color: Colors.black87.withOpacity(0.7),
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }
