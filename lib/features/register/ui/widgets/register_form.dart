@@ -19,6 +19,7 @@ class RegisterForm extends StatefulWidget {
   final PlatformFile? cvFile;
   final Function(DateTime) onDateSelected;
   final Function(PlatformFile) onFileSelected;
+  final VoidCallback sendCVByEmail;
 
   const RegisterForm({
     super.key,
@@ -34,6 +35,7 @@ class RegisterForm extends StatefulWidget {
     required this.cvFile,
     required this.onDateSelected,
     required this.onFileSelected,
+    required this.sendCVByEmail,
   });
 
   @override
@@ -195,6 +197,7 @@ class _RegisterFormState extends State<RegisterForm> {
               title: "رفع السيرة الذاتية",
               file: widget.cvFile,
               onFileSelected: widget.onFileSelected,
+              sendCVByEmail: widget.sendCVByEmail,
             ),
             const SizedBox(height: 16),
             CustomTextField(

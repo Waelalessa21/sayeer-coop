@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -5,14 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sayeercoop/common/layout/responsive.dart';
-import 'package:sayeercoop/common/routing/extension.dart';
 import 'package:sayeercoop/common/routing/routes.dart';
 import 'package:sayeercoop/common/theme/colors.dart';
 import 'package:sayeercoop/common/widgets/buttons/app_button.dart';
 import 'package:sayeercoop/common/widgets/custom/message.dart';
 import 'package:sayeercoop/features/register/ui/widgets/arrow_back.dart';
+import 'package:sayeercoop/features/register/ui/widgets/loadingOverlay.dart';
 import 'package:sayeercoop/features/register/ui/widgets/register_form.dart';
 import 'package:sayeercoop/features/register/ui/widgets/step_icon_container.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RegisterStepper extends StatefulWidget {
   const RegisterStepper({super.key});
@@ -24,6 +26,7 @@ class RegisterStepper extends StatefulWidget {
 class _RegisterStepperState extends State<RegisterStepper> {
   final _formKey = GlobalKey<FormState>();
   int currentStep = 0;
+  bool isLoading = false;
 
   final bioController = TextEditingController();
   final nameController = TextEditingController();
@@ -69,6 +72,44 @@ class _RegisterStepperState extends State<RegisterStepper> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _initializeSerialCounter();
+  }
+
+  void _initializeSerialCounter() async {
+    final docRef = FirebaseFirestore.instance
+        .collection('sequence')
+        .doc('coop_id');
+
+    final snapshot = await docRef.get();
+
+    if (!snapshot.exists) {
+      await docRef.set({'last': 99});
+    }
+  }
+
+  void _sendCVByEmail() async {
+    final name = nameController.text;
+    final phone = phoneController.text;
+
+    final subject = Uri.encodeComponent("تدريب تعاوني - السيرة الذاتية");
+    final body = Uri.encodeComponent("الاسم: $name\nرقم الجوال: $phone");
+
+    final emailUri = Uri.parse(
+      "mailto:contact@sayeer.sa?subject=$subject&body=$body",
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("تعذر فتح تطبيق الإيميل")));
+    }
+  }
+
   void submitForm() async {
     if (!_formKey.currentState!.validate()) {
       showToastMessage(
@@ -81,29 +122,28 @@ class _RegisterStepperState extends State<RegisterStepper> {
     }
 
     try {
-      showToastMessage(
-        context,
-        'بدء عملية الإرسال',
-        'assets/icons/check.png',
-        isError: false,
-      );
+      setState(() => isLoading = true);
 
-      String? cvUrl;
+      // جلب آخر رقم تسلسلي من Firestore
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('sequence')
+              .doc('coop_id')
+              .get();
 
-      if (cvFile?.bytes != null) {
-        showToastMessage(
-          context,
-          'جاري رفع السيرة الذاتية...',
-          'assets/icons/check.png',
-          isError: false,
-        );
-        final storageRef = FirebaseStorage.instance.ref().child(
-          'cv_files/${cvFile!.name}',
-        );
-        final uploadTask = await storageRef.putData(cvFile!.bytes!);
-        cvUrl = await uploadTask.ref.getDownloadURL();
+      int serial = 100;
+
+      if (snapshot.exists && snapshot.data()?['last'] != null) {
+        serial = snapshot.data()!['last'] + 1;
       }
 
+      // تحديث الرقم في قاعدة البيانات
+      await FirebaseFirestore.instance
+          .collection('sequence')
+          .doc('coop_id')
+          .set({'last': serial});
+
+      // إضافة البيانات العامة إلى Firestore
       await FirebaseFirestore.instance.collection('coops').add({
         'name': nameController.text,
         'phone': phoneController.text,
@@ -113,22 +153,28 @@ class _RegisterStepperState extends State<RegisterStepper> {
         'bio': bioController.text,
         'experience': experienceController.text,
         'expectedStartDate': expectedStartDate?.toIso8601String(),
-        'cvName': cvFile?.name ?? '',
-        'cvUrl': cvUrl ?? '',
         'timestamp': FieldValue.serverTimestamp(),
+        'serial': serial,
       });
 
-      showToastMessage(
-        context,
-        'تم إرسال البيانات بنجاح',
-        'assets/icons/check.png',
-        isError: false,
+      final subject = Uri.encodeComponent("تدريب تعاوني - $serial#");
+      final body = Uri.encodeComponent(
+        "الاسم: ${nameController.text}\nرقم الجوال: ${phoneController.text}",
       );
+
+      final url = "mailto:contact@sayeer.sa?subject=$subject&body=$body";
+
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
+      }
+
+      setState(() => isLoading = false);
       context.go(Routes.doneScreen);
     } catch (e) {
+      setState(() => isLoading = false);
       showToastMessage(
         context,
-        'حدث خطأ أثناء الإرسال: ${e.toString()}',
+        'حدث خطأ أثناء تجهيز الإيميل: ${e.toString()}',
         'assets/icons/warning.png',
         isError: true,
       );
@@ -139,71 +185,80 @@ class _RegisterStepperState extends State<RegisterStepper> {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
 
-    return Padding(
-      padding: EdgeInsets.all(20.w),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: Row(
-                key: ValueKey(currentStep),
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StepIconContainer(iconPath: stepIcons[currentStep]),
-
-                  SizedBox(width: 4.w),
-                  Column(
+    return Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(20.w),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Row(
+                    key: ValueKey(currentStep),
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        stepTitles[currentStep],
-                        style: TextStyle(
-                          fontSize: isDesktop ? 8.sp : 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: TColors.textDarkBlue,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        stepSubtitles[currentStep],
-                        style: TextStyle(
-                          fontSize: isDesktop ? 6.sp : 11.sp,
-                          color: Colors.grey,
-                        ),
+                      StepIconContainer(iconPath: stepIcons[currentStep]),
+                      SizedBox(width: 4.w),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            stepTitles[currentStep],
+                            style: TextStyle(
+                              fontSize: isDesktop ? 8.sp : 14.sp,
+                              fontWeight: FontWeight.bold,
+                              color: TColors.textDarkBlue,
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            stepSubtitles[currentStep],
+                            style: TextStyle(
+                              fontSize: isDesktop ? 6.sp : 11.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                SizedBox(height: 30.h),
+                RegisterForm(
+                  sendCVByEmail: _sendCVByEmail,
+                  currentStep: currentStep,
+                  nameController: nameController,
+                  phoneController: phoneController,
+                  emailController: emailController,
+                  majorController: majorController,
+                  gpaController: gpaController,
+                  bioController: bioController,
+                  experienceController: experienceController,
+                  expectedStartDate: expectedStartDate,
+                  cvFile: cvFile,
+                  onDateSelected:
+                      (date) => setState(() => expectedStartDate = date),
+                  onFileSelected: (file) => setState(() => cvFile = file),
+                ),
+                SizedBox(height: 40.h),
+                CustomButton(
+                  text: currentStep == 2 ? "إرسال" : "التالي",
+                  onPressed: nextStep,
+                ),
+                const SizedBox(height: 10),
+                if (currentStep > 0) ArrowButton(onTap: previousStep),
+              ],
             ),
-            SizedBox(height: 30.h),
-            RegisterForm(
-              currentStep: currentStep,
-              nameController: nameController,
-              phoneController: phoneController,
-              emailController: emailController,
-              majorController: majorController,
-              gpaController: gpaController,
-              bioController: bioController,
-              experienceController: experienceController,
-              expectedStartDate: expectedStartDate,
-              cvFile: cvFile,
-              onDateSelected:
-                  (date) => setState(() => expectedStartDate = date),
-              onFileSelected: (file) => setState(() => cvFile = file),
-            ),
-            SizedBox(height: 40.h),
-            CustomButton(
-              text: currentStep == 2 ? "إرسال" : "التالي",
-              onPressed: nextStep,
-            ),
-            const SizedBox(height: 10),
-            if (currentStep > 0) ArrowButton(onTap: previousStep),
-          ],
+          ),
         ),
-      ),
+        if (isLoading)
+          const LoadingOverlay(
+            message:
+                'طلبك انطلق… وساير رفيقك للانطلاق في مسارك المهني العظيم🚀',
+          ),
+      ],
     );
   }
 }

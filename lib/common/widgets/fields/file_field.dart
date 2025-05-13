@@ -7,10 +7,12 @@ import 'package:sayeercoop/common/theme/colors.dart';
 class FilePickerField extends StatelessWidget {
   final String title;
   final PlatformFile? file;
+  final VoidCallback sendCVByEmail;
   final Function(PlatformFile) onFileSelected;
 
   const FilePickerField({
     super.key,
+    required this.sendCVByEmail,
     required this.title,
     required this.file,
     required this.onFileSelected,
@@ -33,13 +35,7 @@ class FilePickerField extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         InkWell(
-          onTap: () async {
-            final result = await FilePicker.platform.pickFiles(
-              type: FileType.custom,
-              allowedExtensions: ['pdf'],
-            );
-            if (result != null) onFileSelected(result.files.first);
-          },
+          onTap: sendCVByEmail,
           borderRadius: BorderRadius.circular(12.r),
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -54,10 +50,12 @@ class FilePickerField extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
-                    file == null ? "اختر الملف (PDF)" : file!.name,
-                    overflow: TextOverflow.ellipsis,
+                    file == null
+                        ? "ارسال السيرة الذاتية عبر الإيميل"
+                        : file!.name,
+                    overflow: TextOverflow.visible,
                     style: TextStyle(
-                      fontSize: 8.sp,
+                      fontSize: 5.sp,
                       color: TColors.textDarkBlue,
                       fontWeight: FontWeight.w400,
                     ),
