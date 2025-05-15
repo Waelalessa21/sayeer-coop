@@ -13,11 +13,14 @@ class LandingScreen extends StatefulWidget {
   State<LandingScreen> createState() => _LandingScreenState();
 }
 
-class _LandingScreenState extends State<LandingScreen>
-    with SingleTickerProviderStateMixin {
+class _LandingScreenState extends State<LandingScreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _knowUsKey = GlobalKey();
   final GlobalKey _sendMessageKey = GlobalKey();
+
+  bool _showStart = false;
+  bool _showKnowUs = false;
+  bool _showSendMessage = false;
 
   void _scrollToKnowUs() {
     final context = _knowUsKey.currentContext;
@@ -42,15 +45,42 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // الترتيب الزمني لظهور كل سكشن
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() => _showStart = true);
+    });
+
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      setState(() => _showKnowUs = true);
+    });
+
+    Future.delayed(const Duration(milliseconds: 1800), () {
+      setState(() => _showSendMessage = true);
+    });
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
+  Widget _animatedSection({required bool visible, required Widget child}) {
+    return AnimatedOpacity(
+      opacity: visible ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOut,
+      child: visible ? child : const SizedBox.shrink(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF2F9FE),
+      backgroundColor: const Color(0xFFF2F9FE),
       body: SafeArea(
         child: SingleChildScrollView(
           controller: _scrollController,
@@ -66,10 +96,25 @@ class _LandingScreenState extends State<LandingScreen>
                   onSendMessageTap: _scrollToSendMessage,
                 ),
               ),
-              StartSection(),
+
+              // StartSection
+              _animatedSection(
+                visible: _showStart,
+                child: const StartSection(),
+              ),
               const SizedBox(height: 60),
-              KnowUs(key: _knowUsKey),
-              SendMessage(key: _sendMessageKey),
+
+              // KnowUs
+              _animatedSection(
+                visible: _showKnowUs,
+                child: KnowUs(key: _knowUsKey),
+              ),
+
+              // SendMessage
+              _animatedSection(
+                visible: _showSendMessage,
+                child: SendMessage(key: _sendMessageKey),
+              ),
               const SizedBox(height: 40),
             ],
           ),

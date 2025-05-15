@@ -12,6 +12,7 @@ class _PhoneImageState extends State<PhoneImage>
   late final AnimationController _controller;
   late final Animation<Offset> _slideAnimation;
   late final Animation<double> _fadeAnimation;
+  bool _isImageLoaded = false;
 
   @override
   void initState() {
@@ -29,7 +30,17 @@ class _PhoneImageState extends State<PhoneImage>
 
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    _controller.forward();
+    // 🔄 نؤجل تحميل الصورة حتى يكون الـ context جاهز
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      precacheImage(const AssetImage("assets/images/moock.png"), context).then((
+        _,
+      ) {
+        setState(() {
+          _isImageLoaded = true;
+        });
+        _controller.forward();
+      });
+    });
   }
 
   @override
@@ -40,6 +51,10 @@ class _PhoneImageState extends State<PhoneImage>
 
   @override
   Widget build(BuildContext context) {
+    if (!_isImageLoaded) {
+      return const SizedBox(); // أو Spinner لو تحب
+    }
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SlideTransition(
