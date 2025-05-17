@@ -85,7 +85,7 @@ class _LoadingOverlayState extends State<LoadingOverlay>
                         displayedText,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: TColors.info,
+                          color: TColors.SbuttomColor,
                           fontWeight: FontWeight.bold,
                         ),
                       );

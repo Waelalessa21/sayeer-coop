@@ -24,6 +24,7 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final String? helperText;
   final bool enabled;
+  final int? maxLength;
   final AutovalidateMode autovalidateMode;
 
   const CustomTextField({
@@ -49,6 +50,7 @@ class CustomTextField extends StatefulWidget {
     this.helperText,
     this.enabled = true,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.maxLength,
   });
 
   @override
@@ -95,6 +97,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           onFieldSubmitted: widget.onSubmitted,
           readOnly: widget.readOnly,
           enabled: widget.enabled,
+          maxLength: widget.maxLength,
           autovalidateMode: widget.autovalidateMode,
           style: TextStyle(fontSize: isDesktop ? 20 : 12.sp),
           decoration: InputDecoration(
@@ -102,6 +105,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             hintText: widget.hintText,
             errorText: widget.errorText,
             helperText: widget.helperText,
+
             prefixIcon: widget.prefixIcon,
             suffixIcon:
                 widget.isPassword && widget.showPasswordToggle

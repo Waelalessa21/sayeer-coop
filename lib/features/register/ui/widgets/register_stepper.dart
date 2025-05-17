@@ -1,10 +1,9 @@
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sayeercoop/common/helpers/extractor.dart';
 import 'package:sayeercoop/common/layout/responsive.dart';
 import 'package:sayeercoop/common/routing/routes.dart';
 import 'package:sayeercoop/common/theme/colors.dart';
@@ -14,7 +13,6 @@ import 'package:sayeercoop/features/register/ui/widgets/arrow_back.dart';
 import 'package:sayeercoop/features/register/ui/widgets/loadingOverlay.dart';
 import 'package:sayeercoop/features/register/ui/widgets/register_form.dart';
 import 'package:sayeercoop/features/register/ui/widgets/step_icon_container.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class RegisterStepper extends StatefulWidget {
   const RegisterStepper({super.key});
@@ -46,7 +44,7 @@ class _RegisterStepperState extends State<RegisterStepper> {
 
   final List<String> stepSubtitles = [
     'عرفنا عليك؟',
-    'أدخل مؤهلك العلمي',
+    'علّمنا عن دراستك!',
     'أكمل معلومات التدريب',
   ];
 
@@ -82,31 +80,9 @@ class _RegisterStepperState extends State<RegisterStepper> {
     final docRef = FirebaseFirestore.instance
         .collection('sequence')
         .doc('coop_id');
-
     final snapshot = await docRef.get();
-
     if (!snapshot.exists) {
       await docRef.set({'last': 99});
-    }
-  }
-
-  void _sendCVByEmail() async {
-    final name = nameController.text;
-    final phone = phoneController.text;
-
-    final subject = Uri.encodeComponent("تدريب تعاوني - السيرة الذاتية");
-    final body = Uri.encodeComponent("الاسم: $name\nرقم الجوال: $phone");
-
-    final emailUri = Uri.parse(
-      "mailto:contact@sayeer.sa?subject=$subject&body=$body",
-    );
-
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("تعذر فتح تطبيق الإيميل")));
     }
   }
 
@@ -123,27 +99,19 @@ class _RegisterStepperState extends State<RegisterStepper> {
 
     try {
       setState(() => isLoading = true);
-
-      // جلب آخر رقم تسلسلي من Firestore
       final snapshot =
           await FirebaseFirestore.instance
               .collection('sequence')
               .doc('coop_id')
               .get();
-
       int serial = 100;
-
       if (snapshot.exists && snapshot.data()?['last'] != null) {
         serial = snapshot.data()!['last'] + 1;
       }
-
-      // تحديث الرقم في قاعدة البيانات
       await FirebaseFirestore.instance
           .collection('sequence')
           .doc('coop_id')
           .set({'last': serial});
-
-      // إضافة البيانات العامة إلى Firestore
       await FirebaseFirestore.instance.collection('coops').add({
         'name': nameController.text,
         'phone': phoneController.text,
@@ -156,25 +124,13 @@ class _RegisterStepperState extends State<RegisterStepper> {
         'timestamp': FieldValue.serverTimestamp(),
         'serial': serial,
       });
-
-      final subject = Uri.encodeComponent("تدريب تعاوني - $serial#");
-      final body = Uri.encodeComponent(
-        "الاسم: ${nameController.text}\nرقم الجوال: ${phoneController.text}",
-      );
-
-      final url = "mailto:contact@sayeer.sa?subject=$subject&body=$body";
-
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url));
-      }
-
       setState(() => isLoading = false);
       context.go(Routes.doneScreen);
     } catch (e) {
       setState(() => isLoading = false);
       showToastMessage(
         context,
-        'حدث خطأ أثناء تجهيز الإيميل: ${e.toString()}',
+        'حدث خطأ أثناء إرسال البيانات: ${e.toString()}',
         'assets/icons/warning.png',
         isError: true,
       );
@@ -184,7 +140,6 @@ class _RegisterStepperState extends State<RegisterStepper> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-
     return Stack(
       children: [
         Padding(
@@ -227,7 +182,7 @@ class _RegisterStepperState extends State<RegisterStepper> {
                 ),
                 SizedBox(height: 30.h),
                 RegisterForm(
-                  sendCVByEmail: _sendCVByEmail,
+                  key: const PageStorageKey('register_form'),
                   currentStep: currentStep,
                   nameController: nameController,
                   phoneController: phoneController,
@@ -240,7 +195,29 @@ class _RegisterStepperState extends State<RegisterStepper> {
                   cvFile: cvFile,
                   onDateSelected:
                       (date) => setState(() => expectedStartDate = date),
-                  onFileSelected: (file) => setState(() => cvFile = file),
+                  onFileSelected: (file) async {
+                    setState(() => cvFile = file);
+                    final text = await extractPdfText(file);
+                    if (text != null && context.mounted) {
+                      await FirebaseFirestore.instance
+                          .collection('cv_texts')
+                          .add({
+                            'name': nameController.text,
+                            'email': emailController.text,
+                            'phone': phoneController.text,
+                            'major': majorController.text,
+                            'text': text,
+                            'timestamp': FieldValue.serverTimestamp(),
+                          });
+                    } else if (context.mounted) {
+                      showToastMessage(
+                        context,
+                        'تعذر قراءة محتوى الملف',
+                        'assets/icons/warning.png',
+                        isError: true,
+                      );
+                    }
+                  },
                 ),
                 SizedBox(height: 40.h),
                 CustomButton(
@@ -255,8 +232,7 @@ class _RegisterStepperState extends State<RegisterStepper> {
         ),
         if (isLoading)
           const LoadingOverlay(
-            message:
-                'طلبك انطلق… وساير رفيقك للانطلاق في مسارك المهني العظيم🚀',
+            message: 'طلبك انطلق… وساير رفيقك للانطلاق في مسارك🚀',
           ),
       ],
     );

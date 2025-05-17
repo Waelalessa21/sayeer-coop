@@ -14,8 +14,8 @@ class StartButton extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        minWidth: 160,
-        maxWidth: isDesktop ? 200 : double.infinity,
+        minWidth: 130,
+        maxWidth: isDesktop ? 200 : MediaQuery.of(context).size.width * 0.9,
       ),
       child: ElevatedButton(
         onPressed: onPressed,

@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sayeercoop/features/landing/ui/widgets/start_button.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:sayeercoop/common/widgets/buttons/download_button.dart';
 
 class TextContent extends StatelessWidget {
   final bool isDesktop;
 
   const TextContent({super.key, required this.isDesktop});
-
-  Future<void> launchAppStore() async {
-    final url = Uri.parse(
-      "https://apps.apple.com/us/app/sayer-%D8%B3%D8%A7%D9%8A%D8%B1/id6596770954",
-    );
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,13 +67,7 @@ class TextContent extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.25,
-            child: Image.asset("assets/images/download.png"),
-          ),
-          SizedBox(height: 20),
-
-          StartButton(onPressed: launchAppStore, text: "حمل التطبيق"),
+          DownloadButton(isDesktop: isDesktop),
         ],
       ),
     );

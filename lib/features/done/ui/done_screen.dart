@@ -52,7 +52,6 @@ class _DoneScreenState extends State<DoneScreen>
                     width: screenWidth,
                     height: screenHeight,
                   ),
-                  SizedBox(height: 30.h),
                   DoneText(),
                   SizedBox(height: 30.h),
                   DoneButton(),

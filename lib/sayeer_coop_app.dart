@@ -17,8 +17,8 @@ class SayeerCoopApp extends StatelessWidget {
         return MaterialApp.router(
           title: 'Sayeer | ساير',
           theme: ThemeData(
-            fontFamily: "IBMPlexSansArabic",
             primarySwatch: Colors.blue,
+            fontFamily: "IBMPlexSansArabic",
             scaffoldBackgroundColor: const Color(0xFFF2F9FE),
             appBarTheme: const AppBarTheme(
               backgroundColor: Color(0xFFF2F9FE),

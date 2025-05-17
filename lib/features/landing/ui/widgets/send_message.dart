@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sayeercoop/common/layout/responsive.dart';
 import 'package:sayeercoop/common/theme/colors.dart';
 import 'package:sayeercoop/features/landing/ui/widgets/message_form.dart';
@@ -70,7 +71,7 @@ class _SendMessageState extends State<SendMessage>
                                 color: TColors.SbuttomColor,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: "IBMPlexSansArabic",
-                                fontSize: 40,
+                                fontSize: 30,
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -80,6 +81,11 @@ class _SendMessageState extends State<SendMessage>
                                 fontSize: 20,
                                 color: Colors.grey[700],
                               ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              child: Lottie.asset("assets/images/contact.json"),
                             ),
                           ],
                         ),
@@ -91,27 +97,38 @@ class _SendMessageState extends State<SendMessage>
                       ),
                     ],
                   )
+                  //Mobile
                   : Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        "تواصل معنا",
-                        style: TextStyle(
-                          color: TColors.SbuttomColor,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "IBMPlexSansArabic",
-                          fontSize: 32,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+
+                        children: [
+                          Text(
+                            "تواصل معنا",
+                            style: TextStyle(
+                              color: TColors.SbuttomColor,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "IBMPlexSansArabic",
+                              fontSize: 26,
+                            ),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.1,
+                            child: Lottie.asset("assets/images/contact.json"),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'وصل لنا الرسالة اللي تبيها أو اسأل السؤال اللي تبي تعرفه!',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                       ),
                       const SizedBox(height: 32),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.6,
+                        width: MediaQuery.of(context).size.width * 0.7,
                         child: const SendMessageForm(),
                       ),
                     ],
