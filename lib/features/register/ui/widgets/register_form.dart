@@ -1,7 +1,10 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sayeercoop/common/helpers/extractor.dart';
+import 'package:sayeercoop/common/helpers/validator.dart';
 import 'package:sayeercoop/common/theme/colors.dart';
+import 'package:sayeercoop/common/widgets/custom/message.dart';
 import 'package:sayeercoop/common/widgets/fields/app_text_field.dart';
 import 'package:sayeercoop/common/widgets/fields/date_field.dart';
 import 'package:sayeercoop/common/widgets/fields/file_field.dart';
@@ -19,7 +22,6 @@ class RegisterForm extends StatefulWidget {
   final PlatformFile? cvFile;
   final Function(DateTime) onDateSelected;
   final Function(PlatformFile) onFileSelected;
-  final VoidCallback sendCVByEmail;
 
   const RegisterForm({
     super.key,
@@ -35,7 +37,6 @@ class RegisterForm extends StatefulWidget {
     required this.cvFile,
     required this.onDateSelected,
     required this.onFileSelected,
-    required this.sendCVByEmail,
   });
 
   @override
@@ -44,25 +45,6 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   String gpaOutOf = '5';
-
-  String? validatePhone(String? value) {
-    final pattern = RegExp(r'^(05)[0-9]{8}$');
-    if (value == null || !pattern.hasMatch(value)) return 'رقم غير صحيح';
-    return null;
-  }
-
-  String? validateEmail(String? value) {
-    if (value == null || !value.contains('@')) return 'بريد غير صالح';
-    return null;
-  }
-
-  String? validateGpa(String? value) {
-    final gpa = double.tryParse(value ?? '');
-    if (gpa == null) return 'المعدل غير صالح';
-    final max = gpaOutOf == '5' ? 5.0 : 4.0;
-    if (gpa < 0 || gpa > max) return 'المعدل يجب أن يكون بين 0 و $max';
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +56,7 @@ class _RegisterFormState extends State<RegisterForm> {
               fieldTitle: "الاسم",
               controller: widget.nameController,
               hintText: "عبدالله سعود",
-              validator: (v) => v!.isEmpty ? "مطلوب" : null,
+              validator: Validators.validateRequired,
             ),
             const SizedBox(height: 16),
             CustomTextField(
@@ -82,7 +64,7 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: widget.phoneController,
               hintText: "05XXXXXXXX",
               keyboardType: TextInputType.phone,
-              validator: validatePhone,
+              validator: Validators.validatePhone,
             ),
             const SizedBox(height: 16),
             CustomTextField(
@@ -90,7 +72,7 @@ class _RegisterFormState extends State<RegisterForm> {
               controller: widget.emailController,
               hintText: "Abdullah@example.com",
               keyboardType: TextInputType.emailAddress,
-              validator: validateEmail,
+              validator: Validators.validateEmail,
             ),
           ],
         );
@@ -100,20 +82,23 @@ class _RegisterFormState extends State<RegisterForm> {
             CustomTextField(
               fieldTitle: "التخصص",
               controller: widget.majorController,
+              keyboardType: TextInputType.text,
               hintText: "علوم حاسب",
-              validator: (v) => v!.isEmpty ? "مطلوب" : null,
+              validator: Validators.validateRequired,
             ),
             const SizedBox(height: 16),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: CustomTextField(
                     fieldTitle: "المعدل",
                     controller: widget.gpaController,
                     hintText: "4.32",
-                    keyboardType: TextInputType.number,
-                    validator: validateGpa,
+                    keyboardType: TextInputType.text,
+                    validator:
+                        (value) => Validators.validateGpa(value, gpaOutOf),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -166,7 +151,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                       elevation: MaterialStateProperty.all(6),
                     ),
-                    dropdownMenuEntries: [
+                    dropdownMenuEntries: const [
                       DropdownMenuEntry(value: "5", label: "5"),
                       DropdownMenuEntry(value: "4", label: "4"),
                     ],
@@ -177,10 +162,12 @@ class _RegisterFormState extends State<RegisterForm> {
             const SizedBox(height: 16),
             CustomTextField(
               fieldTitle: "نبذة",
+              maxLines: 4,
+              maxLength: 120,
               controller: widget.bioController,
               hintText:
                   "طالب علوم حاسب، مبرمج تطبيقات و مهتم بالذكاء الاصطناعي",
-              validator: (v) => v!.isEmpty ? "مطلوب" : null,
+              validator: Validators.validateRequired,
             ),
           ],
         );
@@ -196,8 +183,19 @@ class _RegisterFormState extends State<RegisterForm> {
             FilePickerField(
               title: "رفع السيرة الذاتية",
               file: widget.cvFile,
-              onFileSelected: widget.onFileSelected,
-              sendCVByEmail: widget.sendCVByEmail,
+              onFileSelected: (file) async {
+                widget.onFileSelected(file);
+                final text = await extractPdfText(file);
+                if (text != null && context.mounted) {
+                } else if (context.mounted) {
+                  showToastMessage(
+                    context,
+                    "تأكد من حجم الملف!",
+                    'assets/icons/warning.png',
+                    isError: true,
+                  );
+                }
+              },
             ),
             const SizedBox(height: 16),
             CustomTextField(

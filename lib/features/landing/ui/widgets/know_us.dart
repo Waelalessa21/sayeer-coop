@@ -66,8 +66,8 @@ class _KnowUsState extends State<KnowUs> with SingleTickerProviderStateMixin {
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           text: 'تعرف على ',
-                          style: const TextStyle(
-                            fontSize: 30,
+                          style: TextStyle(
+                            fontSize: isDesktop ? 30 : 26,
                             color: Colors.black,
                             fontFamily: "IBMPlexSansArabic",
                           ),
@@ -77,6 +77,8 @@ class _KnowUsState extends State<KnowUs> with SingleTickerProviderStateMixin {
                               style: TextStyle(
                                 color: TColors.SbuttomColor,
                                 fontWeight: FontWeight.bold,
+                                fontSize: isDesktop ? 30 : 26,
+
                                 fontFamily: "IBMPlexSansArabic",
                               ),
                             ),
@@ -88,7 +90,7 @@ class _KnowUsState extends State<KnowUs> with SingleTickerProviderStateMixin {
                         'ساير تطبيق يجمع عروض السيارات من الوكالات والمعارض في مكان واحد ليسهّل عليك عملية البحث والاختيار.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: isDesktop ? 18 : 16,
+                          fontSize: isDesktop ? 18 : 15,
                           color: Colors.grey[700],
                         ),
                       ),
@@ -98,6 +100,7 @@ class _KnowUsState extends State<KnowUs> with SingleTickerProviderStateMixin {
                             isDesktop
                                 ? MediaQuery.of(context).size.width * 0.8
                                 : double.infinity,
+
                         child: Image.asset("assets/images/www.png"),
                       ),
                     ],

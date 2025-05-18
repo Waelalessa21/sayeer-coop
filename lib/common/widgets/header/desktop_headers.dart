@@ -21,15 +21,12 @@ class DesktopHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          InkWell(
-            onTap: () => context.go(Routes.landingScreen),
-            child: Text(
-              'ساير',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 26,
-                color: TColors.Ssecondery,
-              ),
+          Text(
+            'ساير',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 26,
+              color: TColors.Ssecondery,
             ),
           ),
           Row(

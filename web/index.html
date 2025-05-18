@@ -19,7 +19,6 @@
 </head>
 
 <body>
-  <!-- شاشة التحميل -->
   <div id="loading-indicator">
     <style>
       #loading-indicator {
@@ -37,8 +36,9 @@
       }
 
       .logo {
-        height: 100px;
-        width: auto;
+        height: auto;
+        width: 80px;
+        max-width: 30vw;
         animation: pulse 2s ease-in-out infinite;
       }
 
@@ -48,7 +48,7 @@
         }
 
         50% {
-          transform: scale(1.2);
+          transform: scale(1.1);
         }
 
         100% {
@@ -59,22 +59,30 @@
       .loading-text {
         margin-top: 20px;
         font-family: sans-serif;
-        font-size: 18px;
+        font-size: 16px;
         color: #3E8ED0;
+      }
+
+      @media screen and (max-width: 768px) {
+        .logo {
+          width: 60px;
+        }
+        
+        .loading-text {
+          font-size: 14px;
+        }
       }
     </style>
 
     <img class="logo" src="sayer-logo.png" alt="Sayeer Logo" />
   </div>
 
-  <!-- انتظر حتى Flutter ينتهي فعلاً -->
   <script>
     window.addEventListener('flutter-initialized', function () {
       document.getElementById('loading-indicator')?.remove();
     });
   </script>
 
-  <!-- تحميل تطبيق Flutter -->
   <script src="flutter_bootstrap.js"></script>
 </body>
 

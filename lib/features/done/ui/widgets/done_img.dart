@@ -22,7 +22,7 @@ class DoneImage extends StatelessWidget {
       child: SizedBox(
         width: isDesktop ? width * 0.3 : width * 0.7,
         height: isDesktop ? height * 0.5 : height * 0.5,
-        child: Image.asset('assets/images/join.png'),
+        child: Image.asset('assets/images/JoinSayeer.png'),
       ),
     );
   }
