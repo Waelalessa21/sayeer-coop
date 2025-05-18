@@ -101,9 +101,7 @@ class _SendMessageFormState extends State<SendMessageForm> {
             hintText: 'abdullah@gmail.com',
           ),
           const SizedBox(height: 24),
-          isLoading
-              ? const CircularProgressIndicator()
-              : CustomButton(onPressed: _submitForm, text: "إرسال"),
+          CustomButton(onPressed: _submitForm, text: "إرسال"),
         ],
       ),
     );
