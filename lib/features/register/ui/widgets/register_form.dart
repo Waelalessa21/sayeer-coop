@@ -288,10 +288,6 @@ class _RegisterFormState extends State<RegisterForm>
                         isError: true,
                       );
                     }
-                  } finally {
-                    if (context.mounted && Navigator.canPop(context)) {
-                      Navigator.of(context).pop();
-                    }
                   }
                 },
               ),
