@@ -30,7 +30,6 @@ class _PhoneImageState extends State<PhoneImage>
 
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    // 🔄 نؤجل تحميل الصورة حتى يكون الـ context جاهز
     WidgetsBinding.instance.addPostFrameCallback((_) {
       precacheImage(const AssetImage("assets/images/moock.png"), context).then((
         _,

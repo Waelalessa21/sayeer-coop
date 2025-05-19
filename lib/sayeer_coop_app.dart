@@ -17,7 +17,19 @@ class SayeerCoopApp extends StatelessWidget {
         return MaterialApp.router(
           title: 'Sayeer | ساير',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            colorScheme: const ColorScheme(
+              brightness: Brightness.light,
+              primary: Colors.black,
+              onPrimary: Colors.white,
+              secondary: Colors.grey,
+              onSecondary: Colors.black,
+              error: Colors.red,
+              onError: Colors.white,
+              background: Colors.white,
+              onBackground: Colors.black,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
             fontFamily: "IBMPlexSansArabic",
             scaffoldBackgroundColor: const Color(0xFFF2F9FE),
             appBarTheme: const AppBarTheme(
@@ -45,7 +57,6 @@ class SayeerCoopApp extends StatelessWidget {
               textDirection: TextDirection.rtl,
               child: child ?? const SizedBox(),
             );
-            // Ensure overlay is available for FlutterToast
             return MediaQuery(
               data: MediaQuery.of(context),
               child: Navigator(
