@@ -87,7 +87,7 @@ class _KnowUsState extends State<KnowUs> with SingleTickerProviderStateMixin {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'ساير تطبيق يجمع عروض السيارات من الوكالات والمعارض في مكان واحد ليسهّل عليك عملية البحث والاختيار.',
+                        'ساير تطبيق يجمع عروض السيارات من الوكالات والمعارض في مكان واحد ليسهّل عليك عملية البحث والاختيار',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: isDesktop ? 18 : 15,
@@ -107,7 +107,7 @@ class _KnowUsState extends State<KnowUs> with SingleTickerProviderStateMixin {
                   ),
                 ),
               )
-              : const SizedBox(), // تقدر تحط Spinner مؤقت لو تحب
+              : const SizedBox(),
     );
   }
 }

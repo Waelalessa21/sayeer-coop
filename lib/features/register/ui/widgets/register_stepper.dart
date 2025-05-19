@@ -99,6 +99,7 @@ class _RegisterStepperState extends State<RegisterStepper> {
 
     try {
       setState(() => isLoading = true);
+      await Future.delayed(Duration.zero);
       final snapshot =
           await FirebaseFirestore.instance
               .collection('sequence')

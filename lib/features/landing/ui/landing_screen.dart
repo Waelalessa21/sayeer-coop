@@ -5,6 +5,7 @@ import 'package:sayeercoop/common/widgets/header/mobile_header.dart';
 import 'package:sayeercoop/features/landing/ui/widgets/know_us.dart';
 import 'package:sayeercoop/features/landing/ui/widgets/send_message.dart';
 import 'package:sayeercoop/features/landing/ui/widgets/start_section.dart';
+import 'package:sayeercoop/features/landing/ui/widgets/why_sayeer.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -16,11 +17,14 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _knowUsKey = GlobalKey();
+  final GlobalKey _whySayeer = GlobalKey();
+
   final GlobalKey _sendMessageKey = GlobalKey();
 
   bool _showStart = false;
   bool _showKnowUs = false;
   bool _showSendMessage = false;
+  bool _showWhySayeer = false;
 
   void _scrollToKnowUs() {
     final context = _knowUsKey.currentContext;
@@ -48,7 +52,6 @@ class _LandingScreenState extends State<LandingScreen> {
   void initState() {
     super.initState();
 
-    // الترتيب الزمني لظهور كل سكشن
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() => _showStart = true);
     });
@@ -57,7 +60,11 @@ class _LandingScreenState extends State<LandingScreen> {
       setState(() => _showKnowUs = true);
     });
 
-    Future.delayed(const Duration(milliseconds: 1800), () {
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      setState(() => _showWhySayeer = true);
+    });
+
+    Future.delayed(const Duration(milliseconds: 2000), () {
       setState(() => _showSendMessage = true);
     });
   }
@@ -97,20 +104,24 @@ class _LandingScreenState extends State<LandingScreen> {
                 ),
               ),
 
-              // StartSection
               _animatedSection(
                 visible: _showStart,
                 child: const StartSection(),
               ),
               const SizedBox(height: 60),
 
-              // KnowUs
               _animatedSection(
                 visible: _showKnowUs,
                 child: KnowUs(key: _knowUsKey),
               ),
+              const SizedBox(height: 60),
 
-              // SendMessage
+              _animatedSection(
+                visible: _showWhySayeer,
+                child: WhySayeer(key: _whySayeer),
+              ),
+              const SizedBox(height: 60),
+
               _animatedSection(
                 visible: _showSendMessage,
                 child: SendMessage(key: _sendMessageKey),

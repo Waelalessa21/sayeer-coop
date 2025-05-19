@@ -75,23 +75,25 @@ class _DownloadButtonState extends State<DownloadButton>
               child: Image.asset("assets/images/download.png"),
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SlideTransition(
-                  position: _rocketAnimation,
-                  child: const Text('🚀', style: TextStyle(fontSize: 24)),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'القى سيارتك الان! حمل التطبيق',
-                  style: TextStyle(
-                    color: isHovered ? TColors.primary : TColors.SbuttomColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                children: [
+                  SlideTransition(
+                    position: _rocketAnimation,
+                    child: const Text('🚀', style: TextStyle(fontSize: 24)),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    'القى سيارتك الان! حمل التطبيق',
+                    style: TextStyle(
+                      color: isHovered ? TColors.primary : TColors.SbuttomColor,
+                      fontSize: widget.isDesktop ? 22 : 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

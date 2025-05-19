@@ -8,19 +8,57 @@ class FilePickerField extends StatefulWidget {
   final String title;
   final PlatformFile? file;
   final Function(PlatformFile) onFileSelected;
+  final bool isLoading;
 
   const FilePickerField({
     super.key,
     required this.title,
     required this.file,
     required this.onFileSelected,
+    this.isLoading = false,
   });
 
   @override
   State<FilePickerField> createState() => _FilePickerFieldState();
 }
 
-class _FilePickerFieldState extends State<FilePickerField> {
+class _FilePickerFieldState extends State<FilePickerField>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _shakeController;
+  late Animation<Offset> _shakeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _shakeAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.02, 0),
+    ).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant FilePickerField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isLoading && !_shakeController.isAnimating) {
+      _shakeController.repeat(reverse: true);
+    } else if (!widget.isLoading && _shakeController.isAnimating) {
+      _shakeController.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -30,9 +68,7 @@ class _FilePickerFieldState extends State<FilePickerField> {
       if (result != null && result.files.isNotEmpty) {
         widget.onFileSelected(result.files.first);
       }
-    } catch (e) {
-      debugPrint("Error picking file: $e");
-    }
+    } catch (_) {}
   }
 
   @override
@@ -66,13 +102,19 @@ class _FilePickerFieldState extends State<FilePickerField> {
                 Icon(Icons.upload_file, color: TColors.primary, size: 12.sp),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: Text(
-                    widget.file == null ? "سيرتك الذاتية" : widget.file!.name,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: isDesktop ? 14 : 11.sp,
-                      color: TColors.textDarkBlue,
-                      fontWeight: FontWeight.w400,
+                  child: SlideTransition(
+                    position:
+                        widget.isLoading
+                            ? _shakeAnimation
+                            : AlwaysStoppedAnimation(Offset.zero),
+                    child: Text(
+                      widget.file == null ? "سيرتك الذاتية" : widget.file!.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isDesktop ? 14 : 11.sp,
+                        color: TColors.textDarkBlue,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ),

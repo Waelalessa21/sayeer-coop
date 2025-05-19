@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sayeercoop/features/landing/ui/widgets/phone_mock.dart';
-import 'package:sayeercoop/features/landing/ui/widgets/start_text.dart';
+import 'package:sayeercoop/common/widgets/custom/phone_mock.dart';
+import 'package:sayeercoop/common/widgets/custom/start_text.dart';
 
 class StartSection extends StatefulWidget {
   const StartSection({super.key});
