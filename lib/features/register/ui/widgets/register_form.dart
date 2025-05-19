@@ -48,6 +48,7 @@ class _RegisterFormState extends State<RegisterForm>
   String gpaOutOf = '5';
   late AnimationController _controller;
   late List<Animation<Offset>> _slideAnimations;
+  PlatformFile? cvFile;
 
   @override
   void initState() {
@@ -251,21 +252,18 @@ class _RegisterFormState extends State<RegisterForm>
             const SizedBox(height: 16),
             SlideTransition(
               position: _slideAnimations[1],
+
               child: FilePickerField(
                 title: "رفع السيرة الذاتية",
                 file: widget.cvFile,
                 onFileSelected: (file) async {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder:
-                        (context) =>
-                            const Center(child: CircularProgressIndicator()),
-                  );
+                  if (!mounted) return;
+
+                  FocusScope.of(context).unfocus();
 
                   try {
-                    widget.onFileSelected(file);
                     final text = await extractPdfText(file);
+
                     if (text == null && context.mounted) {
                       showToastMessage(
                         context,
@@ -273,9 +271,25 @@ class _RegisterFormState extends State<RegisterForm>
                         'assets/icons/warning.png',
                         isError: true,
                       );
+                    } else {
+                      setState(() {
+                        cvFile = file;
+                      });
+
+                      /// ✅ ترجع الملف للـ parent
+                      widget.onFileSelected(file);
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      showToastMessage(
+                        context,
+                        "خطأ أثناء تحليل الملف",
+                        'assets/icons/warning.png',
+                        isError: true,
+                      );
                     }
                   } finally {
-                    if (mounted) {
+                    if (context.mounted && Navigator.canPop(context)) {
                       Navigator.of(context).pop();
                     }
                   }

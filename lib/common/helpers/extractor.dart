@@ -5,11 +5,14 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 Future<String?> extractPdfText(PlatformFile file) async {
   try {
-    Uint8List bytes = file.bytes ?? await File(file.path!).readAsBytes();
+    final Uint8List bytes = file.bytes ?? await File(file.path!).readAsBytes();
+
     final PdfDocument document = PdfDocument(inputBytes: bytes);
-    final String text = PdfTextExtractor(document).extractText();
-    document.dispose();
-    return text;
+    final String? text = PdfTextExtractor(document).extractText();
+
+    document.dispose(); // تحرير الموارد
+
+    return text?.trim().isEmpty == true ? null : text;
   } catch (e) {
     print('❌ Error reading PDF: $e');
     return null;

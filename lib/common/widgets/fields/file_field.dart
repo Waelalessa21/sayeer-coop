@@ -61,14 +61,22 @@ class _FilePickerFieldState extends State<FilePickerField>
 
   Future<void> _pickFile() async {
     try {
+      FocusScope.of(context).unfocus();
+
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
       );
+
       if (result != null && result.files.isNotEmpty) {
-        widget.onFileSelected(result.files.first);
+        final file = result.files.first;
+        widget.onFileSelected(file);
+      } else {
+        debugPrint("لم يتم اختيار ملف");
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("حدث خطأ أثناء اختيار الملف: $e");
+    }
   }
 
   @override

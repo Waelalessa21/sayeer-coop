@@ -197,7 +197,8 @@ class _RegisterStepperState extends State<RegisterStepper> {
                   onDateSelected:
                       (date) => setState(() => expectedStartDate = date),
                   onFileSelected: (file) async {
-                    setState(() => cvFile = file);
+                    setState(() => cvFile = file); // يحدث عرض الاسم فورًا
+
                     final text = await extractPdfText(file);
                     if (text != null && context.mounted) {
                       await FirebaseFirestore.instance
